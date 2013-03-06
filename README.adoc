@@ -61,4 +61,4 @@ I recommend using `yum` because it will install any dependencies that the packag
  yum localinstall $HOME/rpmbuild/RPMS/noarch/rubygem-awestruct-0.5.0.rpm
 
 Now, it's time to start using Awestruct!
-Visit http://awestruct.org for details.
+Visit http://awestruct.org to learn more.
