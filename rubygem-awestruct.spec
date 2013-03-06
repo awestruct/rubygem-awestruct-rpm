@@ -1,5 +1,5 @@
 %global gem_name awestruct
-#%global mandir %{_mandir}/man1
+%global mandir %{_mandir}/man1
 
 Summary: A static site generation tool
 Name: rubygem-%{gem_name}
@@ -95,20 +95,20 @@ mkdir -p %{buildroot}%{_bindir}
 cp -pa .%{_bindir}/* \
         %{buildroot}%{_bindir}/
 
-#mkdir -p %{buildroot}%{mandir}
-#cp -pa .%{gem_instdir}/man/*.1 \
-#        %{buildroot}%{mandir}/
+mkdir -p %{buildroot}%{mandir}
+cp -pa .%{gem_instdir}/man/*.1 \
+        %{buildroot}%{mandir}/
 
 %files
 %dir %{gem_instdir}
 %exclude %{gem_cache}
 %exclude %{gem_instdir}/%{gem_name}.gemspec
-#%exclude %{gem_instdir}/test
-#%exclude %{gem_instdir}/man
+#%exclude %{gem_instdir}/spec
+%exclude %{gem_instdir}/man
 %{_bindir}/*
 %{gem_instdir}/bin
 %{gem_libdir}
-#%{mandir}/*
+%{mandir}/*
 %{gem_spec}
 
 %files doc
