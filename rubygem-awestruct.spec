@@ -3,13 +3,24 @@
 
 Summary: A static site generation tool
 Name: rubygem-%{gem_name}
-Version: 0.4.8
+Version: 0.5.0
 Release: 1%{?dist}
 Group: Development/Tools
 License: MIT
 URL: http://awestruct.org
 Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
-%if 0%{?fedora} <= 18
+# Patch0: Disable the minify extension since it depends on compressor libraries
+# not available on Fedora (rubygem-htmlcompressor)
+Patch0: awestruct-disable-minify-extension.patch
+# Patch1: Disable the s3 deployer since it depends on a library not yet
+# available in Fedora (rubygem-s3cmd)
+Patch1: awestruct-disable-s3-deployer.patch
+# Patch2: Disable the bootstrap sass integration since its not yet available in
+# Fedora (rubygem-bootstrap-sass)
+Patch2: awestruct-remove-bootstrap-sass-import.patch
+# Patch3: Set the EXECJS_RUNTIME environment variable suitable for Fedora
+Patch3: awestruct-set-execjs-runtime.patch
+%if 0%{?fedora} < 19
 Requires: ruby(abi) = 1.9.1
 BuildRequires: ruby(abi) = 1.9.1
 %else
@@ -31,11 +42,7 @@ Requires: rubygem(uglifier)
 Requires: rubygem(listen)
 Requires: rubygem(rack)
 Requires: rubygem(eventmachine)
-Requires: rubygem(mustache)
-Requires: rubygem(rdiscount)
-Requires: rubygem(RedCloth)
 Requires: rubygem(coffee-script)
-Requires: rubygem(thin)
 Requires: rubygem(rb-inotify)
 BuildRequires: rubygems-devel
 BuildRequires: ruby(rubygems)
@@ -45,8 +52,9 @@ BuildArch: noarch
 Provides: rubygem(%{gem_name}) = %{version}
 
 %description
-A build tool for generating static HTML websites from templates that are fed
-through an extension pipeline.
+Awestruct is a build tool for creating non-trivial static websites using tools
+like Compass, Haml, Markdown and AsciiDoc as well as common CSS frameworks like
+Twitter Bootstrap and Blueprint.
 
 %package doc
 Summary: Documentation for %{name}
@@ -61,8 +69,14 @@ Documentation for %{name}
 gem unpack -V %{SOURCE0}
 %setup -q -D -T -n %{gem_name}-%{version}
 gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
-#%patch0 -p1
-#%patch1 -p1
+# loosen dependency requirements since they're determined by packaging system
+sed -i "s/\(_dependency(.*\), .*/\1)/" %{gem_name}.gemspec
+sed -i "s/.*\(bootstrap-sass\|ruby-s3cmd\|htmlcompressor\)/#&/" %{gem_name}.gemspec
+
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 gem build %{gem_name}.gemspec
@@ -89,12 +103,8 @@ cp -pa .%{_bindir}/* \
 %dir %{gem_instdir}
 %exclude %{gem_cache}
 %exclude %{gem_instdir}/%{gem_name}.gemspec
-#%exclude %{gem_instdir}/Gemfile
-#%exclude %{gem_instdir}/Rakefile
 #%exclude %{gem_instdir}/test
 #%exclude %{gem_instdir}/man
-#%{gem_instdir}/LICENSE
-#%{gem_instdir}/README.*
 %{_bindir}/*
 %{gem_instdir}/bin
 %{gem_libdir}
@@ -105,5 +115,5 @@ cp -pa .%{_bindir}/* \
 %doc %{gem_docdir}
 
 %changelog
-* Fri Mar 01 2013 Dan Allen <dan.j.allen@gmail.com> - 0.1.1-1
+* Wed Mar 06 2013 Dan Allen <dan.j.allen@gmail.com> - 0.5.0-1
 - Initial package

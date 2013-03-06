@@ -1,0 +1,12 @@
+diff --git a/bin/awestruct b/bin/awestruct
+index 2948a11..01bb7fb 100755
+--- a/bin/awestruct
++++ b/bin/awestruct
+@@ -1,5 +1,7 @@
+ #!/usr/bin/env ruby
+ 
++ENV['EXECJS_RUNTIME'] ||= 'SpiderMonkey'
++
+ $: << File.dirname(__FILE__) + '/../lib'
+ 
+ require 'rubygems'

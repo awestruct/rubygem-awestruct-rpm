@@ -1,0 +1,10 @@
+diff --git a/lib/awestruct/cli/deploy.rb b/lib/awestruct/cli/deploy.rb
+index b54d59c..25142d3 100644
+--- a/lib/awestruct/cli/deploy.rb
++++ b/lib/awestruct/cli/deploy.rb
+@@ -1,4 +1,4 @@
+-require 'awestruct/deploy/s3_deploy'
++#require 'awestruct/deploy/s3_deploy'
+ require 'awestruct/deploy/rsync_deploy'
+ require 'awestruct/deploy/github_pages_deploy'
+ 
