@@ -9,7 +9,7 @@ Group: Development/Tools
 License: MIT
 URL: http://awestruct.org
 Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
-%if 0%{?fedora} < 18
+%if 0%{?fedora} <= 18
 Requires: ruby(abi) = 1.9.1
 BuildRequires: ruby(abi) = 1.9.1
 %else
@@ -31,6 +31,12 @@ Requires: rubygem(uglifier)
 Requires: rubygem(listen)
 Requires: rubygem(rack)
 Requires: rubygem(eventmachine)
+Requires: rubygem(mustache)
+Requires: rubygem(rdiscount)
+Requires: rubygem(RedCloth)
+Requires: rubygem(coffee-script)
+Requires: rubygem(thin)
+Requires: rubygem(rb-inotify)
 BuildRequires: rubygems-devel
 BuildRequires: ruby(rubygems)
 #BuildRequires: rubygem(rspec)
