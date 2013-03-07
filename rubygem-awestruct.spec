@@ -20,6 +20,8 @@ Patch1: awestruct-disable-s3-deployer.patch
 Patch2: awestruct-remove-bootstrap-sass-import.patch
 # Patch3: Set the EXECJS_RUNTIME environment variable suitable for Fedora
 Patch3: awestruct-set-execjs-runtime.patch
+# Patch4: Disable tests that cannot be run
+Patch4: awestruct-disable-select-tests.patch
 %if 0%{?fedora} < 19
 Requires: ruby(abi) = 1.9.1
 BuildRequires: ruby(abi) = 1.9.1
@@ -46,7 +48,15 @@ Requires: rubygem(coffee-script)
 Requires: rubygem(rb-inotify)
 BuildRequires: rubygems-devel
 BuildRequires: ruby(rubygems)
-#BuildRequires: rubygem(rspec)
+BuildRequires: rubygem(rspec)
+BuildRequires: rubygem(hashery)
+BuildRequires: rubygem(rack-test)
+BuildRequires: rubygem(RedCloth)
+BuildRequires: rubygem(slim)
+BuildRequires: rubygem(redcarpet)
+# rdiscount is required for haml < 4.0
+BuildRequires: rubygem(rdiscount)
+BuildRequires: rubygem(mustache)
 #BuildRequires: rubygem(rake)
 BuildArch: noarch
 Provides: rubygem(%{gem_name}) = %{version}
@@ -77,14 +87,23 @@ sed -i "s/.*\(bootstrap-sass\|ruby-s3cmd\|htmlcompressor\)/#&/" %{gem_name}.gems
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 gem build %{gem_name}.gemspec
 %gem_install
 
 %check
-# can't run tests from here, they aren't distributed
-#LANG=en_US.utf8 rspec spec/*_spec.rb
+mv spec/asciidoc_handler_spec.rb spec/asciidoc_handler_spec.rb.disabled
+mv spec/minify_spec.rb spec/minify_spec.rb.disabled
+mv spec/orgmode_handler_spec.rb spec/orgmode_handler_spec.rb.disabled
+mv spec/less_handler_spec.rb spec/less_handler_spec.rb.disabled
+mv spec/tilt_handler_spec.rb spec/tilt_handler_spec.rb.disabled
+# one of the tests is dependent on the presence of the Rakefile
+touch Rakefile
+#mv spec/config_spec.rb spec/config_spec.rb.disabled
+LANG=en_US.utf8 EXECJS_RUNTIME=SpiderMonkey rspec spec/*_spec.rb
+rm Rakefile
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
@@ -95,25 +114,24 @@ mkdir -p %{buildroot}%{_bindir}
 cp -pa .%{_bindir}/* \
         %{buildroot}%{_bindir}/
 
-mkdir -p %{buildroot}%{mandir}
-cp -pa .%{gem_instdir}/man/*.1 \
-        %{buildroot}%{mandir}/
+#mkdir -p %{buildroot}%{mandir}
+#cp -pa .%{gem_instdir}/man/*.1 \
+#        %{buildroot}%{mandir}/
 
 %files
 %dir %{gem_instdir}
 %exclude %{gem_cache}
-%exclude %{gem_instdir}/%{gem_name}.gemspec
-#%exclude %{gem_instdir}/spec
-%exclude %{gem_instdir}/man
+%exclude %{gem_instdir}/spec
+#%exclude %{gem_instdir}/man
 %{_bindir}/*
 %{gem_instdir}/bin
 %{gem_libdir}
-%{mandir}/*
+#%{mandir}/*
 %{gem_spec}
 
 %files doc
 %doc %{gem_docdir}
 
 %changelog
-* Wed Mar 06 2013 Dan Allen <dan.j.allen@gmail.com> - 0.5.0-1
+* Thu Mar 07 2013 Dan Allen <dan.j.allen@gmail.com> - 0.5.0-1
 - Initial package
