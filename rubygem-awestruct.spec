@@ -11,43 +11,43 @@ URL: http://awestruct.org
 Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
 # Patch0: Disable the minify extension since it depends on compressor libraries
 # not available on Fedora (rubygem-htmlcompressor)
-Patch0: awestruct-disable-minify-extension.patch
+#Patch0: awestruct-disable-minify-extension.patch
 # Patch1: Disable the s3 deployer since it depends on a library not yet
 # available in Fedora (rubygem-s3cmd)
 Patch1: awestruct-disable-s3-deployer.patch
 # Patch2: Disable the bootstrap sass integration since its not yet available in
 # Fedora (rubygem-bootstrap-sass)
-Patch2: awestruct-remove-bootstrap-sass-import.patch
+#Patch2: awestruct-remove-bootstrap-sass-import.patch
 # Patch3: Set the EXECJS_RUNTIME environment variable suitable for Fedora
 Patch3: awestruct-set-execjs-runtime.patch
 # Patch4: Disable tests that cannot be run
-Patch4: awestruct-disable-select-tests.patch
-%if 0%{?fedora} < 19
-Requires: ruby(abi) = 1.9.1
-BuildRequires: ruby(abi) = 1.9.1
-%else
+#Patch4: awestruct-disable-select-tests.patch
+%if 0%{?rhel} > 6 || 0%{?fedora} > 18
 Requires: ruby(release)
 BuildRequires: ruby(release)
+%else
+Requires: ruby(abi) = 1.9.1
+BuildRequires: ruby(abi) = 1.9.1
 %endif
 Requires: ruby(rubygems)
-Requires: rubygem(hpricot)
 Requires: rubygem(tilt)
 Requires: rubygem(compass)
 Requires: rubygem(compass-960-plugin)
-#Requires: rubygem(bootstrap-sass)
+Requires: rubygem(bootstrap-sass)
 Requires: rubygem(json)
 Requires: rubygem(rest-client)
 Requires: rubygem(git)
-#Requires: rubygem(htmlcompressor)
-Requires: rubygem(uglifier)
 #Requires: rubygem(ruby-s3cmd)
 Requires: rubygem(listen)
+Requires: rubygem(nokogiri)
 Requires: rubygem(rack)
-Requires: rubygem(eventmachine)
-Requires: rubygem(coffee-script)
 Requires: rubygem(rb-inotify)
 BuildRequires: rubygems-devel
 BuildRequires: ruby(rubygems)
+BuildRequires: rubygem(asciidoctor)
+BuildRequires: rubygem(coffee-script)
+BuildRequires: rubygem(haml)
+#BuildRequires: rubygem(htmlcompressor)
 BuildRequires: rubygem(rspec)
 BuildRequires: rubygem(hashery)
 BuildRequires: rubygem(rack-test)
@@ -57,6 +57,7 @@ BuildRequires: rubygem(redcarpet)
 # rdiscount is required for haml < 4.0
 BuildRequires: rubygem(rdiscount)
 BuildRequires: rubygem(mustache)
+BuildRequires: rubygem(uglifier)
 #BuildRequires: rubygem(rake)
 BuildArch: noarch
 Provides: rubygem(%{gem_name}) = %{version}
@@ -81,27 +82,27 @@ gem unpack -V %{SOURCE0}
 gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
 # loosen dependency requirements since they're determined by packaging system
 sed -i "s/\(_dependency(.*\), .*/\1)/" %{gem_name}.gemspec
-sed -i "s/.*\(bootstrap-sass\|ruby-s3cmd\|htmlcompressor\)/#&/" %{gem_name}.gemspec
+sed -i "s/.*\(ruby-s3cmd\|htmlcompressor\)/#&/" %{gem_name}.gemspec
 
-%patch0 -p1
+#%patch0 -p1
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1
 %patch3 -p1
-%patch4 -p1
+#%patch4 -p1
 
 %build
 gem build %{gem_name}.gemspec
 %gem_install
 
 %check
-mv spec/asciidoc_handler_spec.rb spec/asciidoc_handler_spec.rb.disabled
+# minify test requires unavailable htmlcompressor gem
 mv spec/minify_spec.rb spec/minify_spec.rb.disabled
+# orgmode test requires unavailable orgmode gem
 mv spec/orgmode_handler_spec.rb spec/orgmode_handler_spec.rb.disabled
+# less test requires unavailable less and javascript environment gems
 mv spec/less_handler_spec.rb spec/less_handler_spec.rb.disabled
-mv spec/tilt_handler_spec.rb spec/tilt_handler_spec.rb.disabled
 # one of the tests is dependent on the presence of the Rakefile
 touch Rakefile
-#mv spec/config_spec.rb spec/config_spec.rb.disabled
 LANG=en_US.utf8 EXECJS_RUNTIME=SpiderMonkey rspec spec/*_spec.rb
 rm Rakefile
 
@@ -114,24 +115,24 @@ mkdir -p %{buildroot}%{_bindir}
 cp -pa .%{_bindir}/* \
         %{buildroot}%{_bindir}/
 
-#mkdir -p %{buildroot}%{mandir}
-#cp -pa .%{gem_instdir}/man/*.1 \
-#        %{buildroot}%{mandir}/
+mkdir -p %{buildroot}%{mandir}
+cp -pa .%{gem_instdir}/man/*.1 \
+        %{buildroot}%{mandir}/
 
 %files
 %dir %{gem_instdir}
 %exclude %{gem_cache}
 %exclude %{gem_instdir}/spec
-#%exclude %{gem_instdir}/man
+%exclude %{gem_instdir}/man
 %{_bindir}/*
 %{gem_instdir}/bin
 %{gem_libdir}
-#%{mandir}/*
+%{mandir}/*
 %{gem_spec}
 
 %files doc
 %doc %{gem_docdir}
 
 %changelog
-* Thu Mar 07 2013 Dan Allen <dan.j.allen@gmail.com> - 0.5.0-1
+* Thu Mar 26 2013 Dan Allen <dan.j.allen@gmail.com> - 0.5.0-1
 - Initial package
