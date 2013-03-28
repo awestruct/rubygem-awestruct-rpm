@@ -9,19 +9,11 @@ Group: Development/Tools
 License: MIT
 URL: http://awestruct.org
 Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
-# Patch0: Disable the minify extension since it depends on compressor libraries
-# not available on Fedora (rubygem-htmlcompressor)
-#Patch0: awestruct-disable-minify-extension.patch
-# Patch1: Disable the s3 deployer since it depends on a library not yet
+# Patch0: Disable the s3 deployer since it depends on a library not yet
 # available in Fedora (rubygem-s3cmd)
-Patch1: awestruct-disable-s3-deployer.patch
-# Patch2: Disable the bootstrap sass integration since its not yet available in
-# Fedora (rubygem-bootstrap-sass)
-#Patch2: awestruct-remove-bootstrap-sass-import.patch
-# Patch3: Set the EXECJS_RUNTIME environment variable suitable for Fedora
-Patch3: awestruct-set-execjs-runtime.patch
-# Patch4: Disable tests that cannot be run
-#Patch4: awestruct-disable-select-tests.patch
+Patch0: awestruct-disable-s3-deployer.patch
+# Patch1: Set the EXECJS_RUNTIME environment variable suitable for Fedora
+Patch1: awestruct-set-execjs-runtime.patch
 %if 0%{?rhel} > 6 || 0%{?fedora} > 18
 Requires: ruby(release)
 BuildRequires: ruby(release)
@@ -85,11 +77,8 @@ gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
 sed -i "s/\(_dependency(.*\), .*/\1)/" %{gem_name}.gemspec
 sed -i "s/.*\(ruby-s3cmd\|htmlcompressor\)/#&/" %{gem_name}.gemspec
 
-#%patch0 -p1
+%patch0 -p1
 %patch1 -p1
-#%patch2 -p1
-%patch3 -p1
-#%patch4 -p1
 
 %build
 gem build %{gem_name}.gemspec
