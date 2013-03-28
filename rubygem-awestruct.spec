@@ -135,5 +135,5 @@ cp -pa .%{gem_instdir}/man/*.1 \
 %doc %{gem_docdir}
 
 %changelog
-* Thu Mar 26 2013 Dan Allen <dan.j.allen@gmail.com> - 0.5.0-1
+* Thu Mar 28 2013 Dan Allen <dan.j.allen@gmail.com> - 0.5.0-1
 - Initial package
