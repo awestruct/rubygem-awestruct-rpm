@@ -31,6 +31,7 @@ BuildRequires: ruby(abi) = 1.9.1
 %endif
 Requires: ruby(rubygems)
 Requires: rubygem(tilt)
+Requires: rubygem(haml)
 Requires: rubygem(compass)
 Requires: rubygem(compass-960-plugin)
 Requires: rubygem(bootstrap-sass)
@@ -46,7 +47,6 @@ BuildRequires: rubygems-devel
 BuildRequires: ruby(rubygems)
 BuildRequires: rubygem(asciidoctor)
 BuildRequires: rubygem(coffee-script)
-BuildRequires: rubygem(haml)
 #BuildRequires: rubygem(htmlcompressor)
 BuildRequires: rubygem(rspec)
 BuildRequires: rubygem(hashery)
@@ -61,6 +61,7 @@ BuildRequires: rubygem(uglifier)
 #BuildRequires: rubygem(rake)
 BuildArch: noarch
 Provides: rubygem(%{gem_name}) = %{version}
+Provides: %{gem_name} = %{version}
 
 %description
 Awestruct is a build tool for creating non-trivial static websites using tools
